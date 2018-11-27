@@ -27,7 +27,7 @@ export default class Home extends React.Component {
     constructor(){
         super();
         this.handleAppStateChange = this.handleAppStateChange.bind(this);
-        this.socket = io('http://socket-fp-soft-eng.herokuapp.com/', {jsonp: false});
+        this.socket = io('http://179.128.11.69:80', {jsonp: false});
     }
 
     componentDidMount = async() => {

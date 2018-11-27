@@ -8,6 +8,7 @@ import SignIn from "./components/sign-in/sign-in";
 import SignUp from "./components/sign-up/sign-up";
 import UserList from "./components/menu/userList";
 import NotifDetails from "./components/menu/notifDetails";
+import Gallery from "./components/menu/gallery";
 import { AsyncStorage, StyleSheet, View, Text, TextInput, Button, TouchableOpacity, Image, StatusBar, Dimensions, ScrollView } from 'react-native';
 
 import{ createBottomTabNavigator, StackNavigator } from 'react-navigation';
@@ -46,6 +47,19 @@ export const MainMenu = createBottomTabNavigator(
         navigationOptions: {
           // tabBarIcon: <Icon name="warning" size={25} />
           tabBarIcon: ({tintColor}) => <Icon name='notifications' color={tintColor} size={25}/>,
+          tabBarOptions: {
+            activeTintColor: 'white', 
+            style: {
+              backgroundColor: 'black',
+            }
+          }
+        }
+      },
+      Gallery:{
+        screen: Gallery,
+        navigationOptions: {
+          // tabBarIcon: <Icon name="warning" size={25} />
+          tabBarIcon: ({tintColor}) => <Icon name='photo' color={tintColor} size={25}/>,
           tabBarOptions: {
             activeTintColor: 'white', 
             style: {

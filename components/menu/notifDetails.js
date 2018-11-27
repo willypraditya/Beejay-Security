@@ -4,6 +4,7 @@ import Communications from 'react-native-communications';
 import axios from 'axios';
 import { sosNumber } from './home';
 import { ACCESS_TOKEN } from '../sign-in/sign-in'
+var moment = require('moment');
 
 var {width, height} = Dimensions.get('window');
 
@@ -14,7 +15,8 @@ export default class notifDetails extends React.Component {
     constructor() {
         super();
         this.state = {
-            imageUrl: ''
+            imageUrl: '',
+            date: ''
         }
     }
     async componentDidMount(){
@@ -28,7 +30,8 @@ export default class notifDetails extends React.Component {
         .then(res => {
             //console.log(res)
             this.setState({
-                imageUrl: res.data.data.imageUrl
+                imageUrl: res.data.data.imageUrl,
+                date: res.data.data.createdDate
             })
             //console.log(this.state.imageUrl)
         })
@@ -36,6 +39,7 @@ export default class notifDetails extends React.Component {
     render() {
         return (
             <View style={styles.wrapper}>
+                <Text style={styles.dateText}>{moment(this.state.date).format('LLLL')}</Text>
                 <Image source={{uri: this.state.imageUrl}} style={{width: 85*vw, height:85*vw, alignSelf: 'center', marginVertical: 7*vh}}/>
                 <View style={styles.notifContainer}>
                     <TouchableOpacity style={styles.customBtnBG} onPress={() => Communications.phonecall(sosNumber, true)}>
@@ -77,5 +81,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 2*vw,
         paddingVertical: 0.5*vh,
         borderRadius: 5
-    }
+    },
+    dateText: {
+        color: 'white',
+        fontSize: 5*vw,
+        alignSelf: 'center',
+    },
 });

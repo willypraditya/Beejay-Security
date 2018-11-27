@@ -1,1 +1,1 @@
-Beejay-Security
+beejay-security

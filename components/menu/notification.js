@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage, StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
+import { AsyncStorage, StyleSheet, Text, View, TouchableOpacity, Dimensions, ScrollView, RefreshControl } from 'react-native';
 import axios from 'axios';
 import io from 'socket.io-client/dist/socket.io';
 window.navigator.userAgent = 'react-native';
@@ -25,7 +25,8 @@ export default class Notification extends React.Component {
         // this.socket = io('http://socket-fp-soft-eng.herokuapp.com/', {jsonp: false});
         this.state = {
             data: [],
-            date: `${new Date().getFullYear() + '/' + new Date().getMonth()}`
+            date: `${new Date().getFullYear() + '/' + new Date().getMonth()}`,
+            refreshing: false
         }
     }
     
@@ -34,14 +35,7 @@ export default class Notification extends React.Component {
         var token = await AsyncStorage.getItem(ACCESS_TOKEN)
         BackgroundTask.schedule()
         
-        //console.log("notif")
-        // this.socket.on("FromAPI", data => {
-        //     alert(data.message)
-        //     PushNotification.localNotification({
-        //         message: data.message
-        //     })
-        // });
-
+        //console.log("notif")  
         axios.get('http://178.128.214.101:7000/home-security/image/warning',{
             params: {
                 date: this.state.date
@@ -54,24 +48,44 @@ export default class Notification extends React.Component {
         }).catch((error) => {
             alert(error);
         });
-        
     }
+    _onRefresh = async () => {
+        var token = await AsyncStorage.getItem(ACCESS_TOKEN)
+        this.setState({refreshing: true});
+        axios.get('http://178.128.214.101:7000/home-security/image/warning',{
+            params: {
+                date: this.state.date
+            },
+            headers: {accessToken: token}
+        }).then(res => {
+            this.setState({
+                data: res.data.data,
+                refreshing: false
+            })
+        }).catch((error) => {
+            alert(error);
+        });
+      }
 
     render() {
         return(
-            <View style={styles.mainMenu}>
+            <ScrollView style={styles.mainMenu}
+                        refreshControl={
+                            <RefreshControl
+                            refreshing={this.state.refreshing}
+                            onRefresh={this._onRefresh}/>
+                        }>
                 {
                     this.state.data.map((dat) => 
                         <TouchableOpacity onPress={() => this.props.navigation.navigate('NotifDetails',{
                             id: dat.id
                         })}>
                             <Text style={styles.userName}>{dat.sensorsFeedback.message}</Text>
-                            <Text style={styles.userMacAddress}>{dat.createdDate}</Text>                       
+                            <Text style={styles.userMacAddress}>{moment(dat.createdDate).format('LLLL')}</Text>                       
                         </TouchableOpacity>
                     )
                 }
-                <PushController/>
-            </View>
+            </ScrollView>
         );
     }
 }
@@ -79,7 +93,6 @@ export default class Notification extends React.Component {
 const styles = StyleSheet.create({
     mainMenu: {
         paddingTop: 1*vh,
-        minHeight: 300*vh,
         backgroundColor: '#181B23',
     },
     userName: {
@@ -90,7 +103,7 @@ const styles = StyleSheet.create({
     },
     userMacAddress: {
         color: 'white',
-        fontSize: 6*vw,
+        fontSize: 4*vw,
         borderBottomColor: 'white',
         borderBottomWidth: 1,
         paddingBottom: 2*vh
